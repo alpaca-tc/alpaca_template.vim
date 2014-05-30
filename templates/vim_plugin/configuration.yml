@@ -1,0 +1,14 @@
+template:
+  filenames:
+    resources:
+      plugin:
+        plugin.vim: ${1:your_plugin_name}.vim
+      autoload:
+        plugin.vim: $1.vim
+  variables:
+    global:
+      plugin_name: 'plugin_name'
+    local:
+      plugin:
+        plugin.vim:
+          plugin_name: 'new plugin_name'
