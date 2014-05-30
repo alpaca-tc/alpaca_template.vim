@@ -10,7 +10,7 @@ module AlpacaTemplate
 
     def expand_template_to(path)
       FileUtils.cd("#{@template_path}/resources") do
-        Dir["**/*"].each do |from_path|
+        Dir["**/{*,.*}"].each do |from_path|
           copy(from_path, path)
         end
       end

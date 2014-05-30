@@ -105,7 +105,7 @@ function! s:load_template(path, option, ...)
   template_path = VIM.evaluate('a:path')
   target_directory = VIM.evaluate('target_directory')
 
-  file_parser = if VIM.evaluate('has_configuration_content')
+  file_parser = if VIM.evaluate('has_configuration_content') == 1
     content = VIM.evaluate('a:1')
     configuration = AlpacaTemplate::Configuration.new.parse!(content)
     AlpacaTemplate::Template.new(template_path, configuration)
