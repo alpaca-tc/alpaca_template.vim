@@ -84,6 +84,6 @@ function! s:load_template(path, configuration_file, target_directory)
       AlpacaTemplate::Template.new(template_path)
   end
 
-  file_parser.copy(target_directory)
+  file_parser.expand_template_to(target_directory)
 EOS
 endfunction
