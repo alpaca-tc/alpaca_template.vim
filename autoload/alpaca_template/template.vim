@@ -28,6 +28,7 @@ function! s:edit_configuration(path, option) "{{{
   " Copy configuration file to tempfile
   let content = readfile(configuration_file)
   if exists('g:loaded_neosnippet')
+    call neosnippet#commands#_clear_markers()
     let parserd_content = alpaca_template#neosnippet#substitute(join(content, "\n"))
     let content = split(parserd_content, "\n")
   endif
@@ -93,7 +94,7 @@ function! s:parse_configuration_and_load_template()
 
   echomsg "Created template"
   unlet b:alpaca_template_configuration
-  quit
+  quit!
 endfunction
 
 function! s:load_template(path, option, ...)

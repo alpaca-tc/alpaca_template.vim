@@ -1,7 +1,7 @@
-if exists('g:<%= variables['plugin_name'] %>')
+if exists('g:loaded_<%= variables['plugin_name'] %>')
   finish
 endif
-let g:<%= variables['plugin_name'] %> = 1
+let g:loaded_<%= variables['plugin_name'] %> = 1
 
 let s:save_cpo = &cpo
 set cpo&vim

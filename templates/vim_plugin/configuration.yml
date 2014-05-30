@@ -1,9 +1,7 @@
 template:
-  filenames:
-    plugin:
-      plugin.vim: ${1:your_plugin_name}.vim
-    autoload:
-      plugin.vim: $1.vim
+  renaming_pattern:
+    plugin/plugin.vim: plugin/${1:your_plugin_name}.vim
+    autoload/plugin.vim: autoload/$1.vim
   variables:
     global:
       plugin_name: $1

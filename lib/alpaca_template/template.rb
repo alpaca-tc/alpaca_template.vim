@@ -14,26 +14,32 @@ module AlpacaTemplate
           copy(from_path, path)
         end
       end
+
+      FileUtils.cd(path) do
+        @configuration.nest('renaming_pattern').each do |from, to|
+          rename(from, to)
+        end
+      end
     end
 
     private
 
-    def rename_target_filepath(from)
-      path = from.split('/')
-      keys = ['filenames'] + path
-      filename = @configuration.nest(*keys)
-      if filename.is_a?(String)
-        path[-1] = filename
-        path.join('/')
+    def rename(from, to)
+      unless File.directory?(File.dirname(to))
+        FileUtils.mkdir_p(File.dirname(to))
+      end
+
+      if File.exists?(from)
+        FileUtils.mv(from, to, force: true)
       else
-        from
+        p 'file_not fond'
       end
     end
 
     def copy(from, to)
       return if File.directory?(from)
 
-      new_file = "#{to}/#{rename_target_filepath(from)}"
+      new_file = "#{to}/#{from}"
 
       unless File.directory?(File.dirname(new_file))
         FileUtils.mkdir_p(File.dirname(new_file))
