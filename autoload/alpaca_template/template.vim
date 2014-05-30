@@ -17,6 +17,8 @@ function! s:initialize_template(path, option)
 
   if filereadable(configuration_file)
     call s:edit_configuration(a:path, a:option)
+  else
+    call s:load_template(a:path, a:option)
   endif
 endfunction
 
@@ -70,7 +72,7 @@ function! s:edit_configuration(path, option) "{{{
   " Initialize template when configuration is saved.
   let b:alpaca_template_configuration = {
         \ 'template_path' : a:path,
-        \ 'target_path' : a:option['target_directory'],
+        \ 'option' : a:option,
         \ }
   augroup AlpacaTemplateConfiguration
     autocmd BufWriteCmd <buffer> call s:parse_configuration_and_load_template()
@@ -85,7 +87,7 @@ function! s:parse_configuration_and_load_template()
   let configuration_content = join(getline(0, '$'), "\n")
   call s:load_template(
         \ b:alpaca_template_configuration['template_path'],
-        \ b:alpaca_template_configuration['target_path'],
+        \ b:alpaca_template_configuration['option'],
         \ configuration_content,
         \ )
 
@@ -94,13 +96,14 @@ function! s:parse_configuration_and_load_template()
   quit
 endfunction
 
-function! s:load_template(path, target_directory, ...)
+function! s:load_template(path, option, ...)
   call alpaca_template#ruby#initialize()
   let has_configuration_content = len(a:000) > 0
+  let target_directory = a:option['target_directory']
 
   ruby << EOS
   template_path = VIM.evaluate('a:path')
-  target_directory = VIM.evaluate('a:target_directory')
+  target_directory = VIM.evaluate('target_directory')
 
   file_parser = if VIM.evaluate('has_configuration_content')
     content = VIM.evaluate('a:1')
