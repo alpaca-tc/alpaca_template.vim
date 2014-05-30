@@ -25,6 +25,10 @@ function! s:edit_configuration(path, option) "{{{
 
   " Copy configuration file to tempfile
   let content = readfile(configuration_file)
+  if exists('g:loaded_neosnippet')
+    let parserd_content = alpaca_template#neosnippet#substitute(join(content, "\n"))
+    let content = split(parserd_content, "\n")
+  endif
   let tempfile = tempname()
   call writefile(content, tempfile)
 
@@ -64,24 +68,46 @@ function! s:edit_configuration(path, option) "{{{
   endif
 
   " Initialize template when configuration is saved.
+  let b:alpaca_template_configuration = {
+        \ 'template_path' : a:path,
+        \ 'target_path' : a:option['target_directory'],
+        \ }
   augroup AlpacaTemplateConfiguration
-    execute 'autocmd BufWriteCmd <buffer> call s:load_template("'. a:path . '", "' . tempfile . '", "' . a:option['target_directory'] . '") | echomsg "Created template" | quit'
+    autocmd BufWriteCmd <buffer> call s:parse_configuration_and_load_template()
   augroup END
 endfunction"}}}
 
-function! s:load_template(path, configuration_file, target_directory)
+function! s:parse_configuration_and_load_template()
+  if !exists('b:alpaca_template_configuration')
+    return
+  endif
+
+  let configuration_content = join(getline(0, '$'), "\n")
+  call s:load_template(
+        \ b:alpaca_template_configuration['template_path'],
+        \ b:alpaca_template_configuration['target_path'],
+        \ configuration_content,
+        \ )
+
+  echomsg "Created template"
+  unlet b:alpaca_template_configuration
+  quit
+endfunction
+
+function! s:load_template(path, target_directory, ...)
   call alpaca_template#ruby#initialize()
+  let has_configuration_content = len(a:000) > 0
 
   ruby << EOS
   template_path = VIM.evaluate('a:path')
-  configuration_path = VIM.evaluate('a:configuration_file')
   target_directory = VIM.evaluate('a:target_directory')
 
-  file_parser = if File.exists?(configuration_path)
-      configuration = AlpacaTemplate::Configuration.new(configuration_path).parse!
-      AlpacaTemplate::Template.new(template_path, configuration)
-    else
-      AlpacaTemplate::Template.new(template_path)
+  file_parser = if VIM.evaluate('has_configuration_content')
+    content = VIM.evaluate('a:1')
+    configuration = AlpacaTemplate::Configuration.new.parse!(content)
+    AlpacaTemplate::Template.new(template_path, configuration)
+  else
+    AlpacaTemplate::Template.new(template_path)
   end
 
   file_parser.expand_template_to(target_directory)

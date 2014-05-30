@@ -2,12 +2,8 @@ require 'yaml'
 
 module AlpacaTemplate
   class Configuration < Hash
-    def initialize(path)
-      @path = path
-    end
-
-    def parse!(parser = YAML)
-      self.replace parser.load_file(@path)['template']
+    def parse!(content, parser = YAML)
+      self.replace parser.load(content)['template']
       self
     end
 
