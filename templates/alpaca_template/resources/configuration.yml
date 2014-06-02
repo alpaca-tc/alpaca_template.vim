@@ -1,5 +1,6 @@
 template:
-  filenames:
+  renaming_pattern:
+    from: to
   variables:
     global:
-    local:
+      name: value
